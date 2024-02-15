@@ -1,0 +1,36 @@
+#we do ls
+level02@SnowCrash:~$ ls
+level02.pcap
+
+#take the pcap file to the kali linux machine to use wireshark
+
+scp -P 4242 level02@10.13.200.62:/home/user/level02/level02.pcap  /home/kali/Desktop/
+
+#use wireshark on the kali linux machine
+
+wireshark ./level02.pcap
+
+#we go to analyze -> follow -> TCP stream and get the following:
+..%..%..&..... ..#..'..$..&..... ..#..'..$.. .....#.....'........... .38400,38400....#.SodaCan:0....'..DISPLAY.SodaCan:0......xterm.........."........!........"..".....b........b....	B.
+..............................1.......!.."......"......!..........."........"..".............	..
+.....................
+Linux 2.6.38-8-generic-pae (::ffff:10.1.1.2) (pts/10)
+
+..wwwbugs login: l.le.ev.ve.el.lX.X
+..
+Password: ft_wandr...NDRel.L0L
+.
+..
+Login incorrect
+wwwbugs login: 
+
+#we notice the string ft_wandr...NDRel.L0L
+#There are unprintable characters, the stream show that this is 7F which DEL in ascii
+#we try ft_waNDReL0L
+
+ft_wandrlevel02@SnowCrash:~$ su flag02
+Password: 
+Don't forget to launch getflag !
+flag02@SnowCrash:~$ getflag
+Check flag.Here is your token : kooda2puivaav1idi4f57q8iq
+

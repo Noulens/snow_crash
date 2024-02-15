@@ -1,0 +1,20 @@
+level00@SnowCrash:~$ find / -user flag00 -print 2>/dev/null
+/usr/sbin/john
+/rofs/usr/sbin/john
+
+level00@SnowCrash:~$ ll /usr/sbin/john
+----r--r-- 1 flag00 flag00 15 Mar  5  2016 /usr/sbin/john
+l
+evel00@SnowCrash:~$ ll /rofs/usr/sbin/john
+----r--r-- 1 flag00 flag00 15 Mar  5  2016 /rofs/usr/sbin/john
+
+level00@SnowCrash:~$ cat  /rofs/usr/sbin/john
+cdiiddwpgswtgt
+
+## Use caesar to decode rot a+15: notohardhere
+
+level00@SnowCrash:~$ su flag00
+Password: 
+Don't forget to launch getflag !
+flag00@SnowCrash:~$ getflag
+Check flag.Here is your token : x24ti5gi3x0ol2eh4esiuxias

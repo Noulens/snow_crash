@@ -1,0 +1,33 @@
+level09@SnowCrash:~$ ll
+total 24
+dr-x------ 1 level09 level09  140 Mar  5  2016 ./
+d--x--x--x 1 root    users    340 Aug 30  2015 ../
+-r-x------ 1 level09 level09  220 Apr  3  2012 .bash_logout*
+-r-x------ 1 level09 level09 3518 Aug 30  2015 .bashrc*
+-rwsr-sr-x 1 flag09  level09 7640 Mar  5  2016 level09*
+-r-x------ 1 level09 level09  675 Apr  3  2012 .profile*
+----r--r-- 1 flag09  level09   26 Mar  5  2016 token
+level09@SnowCrash:~$ cat token 
+f4kmm6p|=�p�n��DB�Du{��
+level09@SnowCrash:~$ ./level09 ./token 
+.0vrojt
+level09@SnowCrash:~$ ./level09 token 
+tpmhr
+level09@SnowCrash:~$ ./level09 qazwsxedc
+qb|zw}kkk
+level09@SnowCrash:~$ ./level09 01234546789
+02468::=?AC
+level09@SnowCrash:~$ ./level09 01234546789~
+02468::=?AC�
+
+#We see that the level09 binary adds to each char their own index value, we postulate that the token string
+#In the file has already been modified by this encoding so all we have to do is reverse the encoding on our VM:
+kali@kali ~/D/snow-crash>scp -P 4242 level09@10.13.200.62:/home/user/level09/token /home/kali/Desktop/
+kali@kali ~/D/snow-crash> python ./decode.py
+f3iji1ju5yuevaus41q1afiuq
+
+level09@SnowCrash:~$ su flag09
+Password: 
+Don't forget to launch getflag !
+flag09@SnowCrash:~$ getflag
+Check flag.Here is your token : s5cAJpM8ev6XHw998pRWG728z

